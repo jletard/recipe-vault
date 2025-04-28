@@ -13,7 +13,8 @@ It is designed primarily for mobile screens but will scale up cleanly on larger 
 
 Each recipe currently displays:
 - The recipe name
-- Associated tags (as styled badges)
+- Associated tags (as styled color-coded badges)
+- (Future) Expandable full recipe details
 
 ---
 
@@ -23,7 +24,10 @@ Each recipe currently displays:
 - Data is fetched live from Airtable.
 - Recipes are displayed as individual cards.
 - Recipes are sorted alphabetically by name.
-- Background, card, and tag styling are in place for a clean visual experience.
+- Tags are displayed as colorful badges (systematically assigned).
+- Tag filtering is fully functional.
+- Live search filtering by recipe name is fully functional.
+- Project architecture is modular, clean, and scalable.
 
 ---
 
@@ -44,13 +48,38 @@ This keeps the Airtable API token **completely hidden from users** and ensures s
 
 ---
 
-## 🛣️ Future Plans
+## 🛣️ Planned TODO Features
 
-- Build a full recipe detail view.
-- Enable search functionality.
-- Add filtering by tags.
-- Create admin-only editing and upload capabilities (TBD).
-- Improve UI/UX with animations and transitions.
+### 🥇 First Priority (MVP - Minimum Working Version)
+
+- Expand/Contract Recipe Cards
+- Format Ingredients into Bulleted List
+- Format Procedure into Numbered List
+
+### 🥈 Second Priority (Adding New Content)
+
+- Add New Recipe Method (Floating "+" Button)
+- Popup Form for New Recipe
+- Tag Picker from Existing Tags (with "Add New Tag" option)
+
+### 🥉 Third Priority (Polishing for Personal Use)
+
+- Required Tag Colors (specific tags = specific colors)
+- Random Color for Unknown/New Tags
+- General UI/UX Polishing
+
+### 🚀 Fourth Priority (Deployment)
+
+- Deploy to Vercel for mobile phone usage
+- Tweak layout and responsiveness for different screen sizes
+
+### 🌎 Fifth Priority (Optional Future Expansion - "World Domination")
+
+- Assign specific colors to specific tags
+- Add user accounts
+- Allow photo uploads
+- Advanced filtering and searching
+- Public version for recipe sharing (TBD)
 
 ---
 
@@ -58,6 +87,7 @@ This keeps the Airtable API token **completely hidden from users** and ensures s
 
 - This project uses **TypeScript** with strict typing across all modules.
 - All Airtable field names are **strongly typed constants** to prevent future bugs.
-- The project structure is modular and cleanly separated (`/app`, `/lib`, `/types`, `/components`).
+- The project structure is modular and cleanly separated (`/app`, `/lib`, `/types`, `/components`, `/utils`, `/hooks`).
+- Fully mobile-first design philosophy, scaling cleanly to desktop.
 
 ---
