@@ -29,7 +29,7 @@ interface AirtableRecipeFields {
   [FIELD_NAMES.INGREDIENTS]?: string;
   [FIELD_NAMES.INSTRUCTIONS]?: string;
   [FIELD_NAMES.NOTES]?: string;
-  [FIELD_NAMES.TAGS]?: string[];
+  [FIELD_NAMES.TAGS]?: string;
 }
 
 interface AirtableRecord {
@@ -62,7 +62,7 @@ export async function fetchRecipes(): Promise<Recipe[]> {
     ingredients: record.fields[FIELD_NAMES.INGREDIENTS] || "",
     instructions: record.fields[FIELD_NAMES.INSTRUCTIONS] || "",
     notes: record.fields[FIELD_NAMES.NOTES] || "",
-    tags: record.fields[FIELD_NAMES.TAGS] || [],
+    tags: JSON.parse(record.fields[FIELD_NAMES.TAGS] || "[]"),
   }));
 
   return recipes;

@@ -9,6 +9,10 @@ import SearchBar from "@/components/SearchBar";
 import TagFilterBox from "@/components/TagFilterBox";
 import { useTagFilter } from "@/hooks/useTagFilter";
 import { buildTagColors } from "@/utils/tagColors";
+import AddRecipeButton from "@/components/AddRecipeButton";
+import AddRecipeModal from "@/components/AddRecipeModal";
+import ExpandContractButton from "@/components/ExpandContractButton";
+import DeleteRecipeButton from "@/components/DeleteRecipeButton";
 
 export default function HomePage() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -16,6 +20,7 @@ export default function HomePage() {
   const [allTags, setAllTags] = useState<string[]>([]);
   const [tagColors, setTagColors] = useState<{ [tag: string]: string }>({});
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
     selectedTags,
@@ -30,30 +35,32 @@ export default function HomePage() {
     setExpandedId((prev) => (prev === id ? null : id));
   };
 
-  useEffect(() => {
-    async function loadRecipes() {
-      try {
-        const res = await fetch("/api/recipes");
-        const data: Recipe[] = await res.json();
+  // ✅ Moved OUT of useEffect
+  async function loadRecipes() {
+    try {
+      const res = await fetch("/api/recipes");
+      const data: Recipe[] = await res.json();
 
-        // Sort recipes alphabetically by name
-        const sorted = data.sort((a, b) => a.name.localeCompare(b.name));
-        setRecipes(sorted);
+      const sorted = data.sort((a, b) =>
+        (a.name || "").localeCompare(b.name || "")
+      );
+      setRecipes(sorted);
 
-        // Extract all unique tags, sorted alphabetically
-        const tags = new Set<string>();
-        data.forEach((recipe) => {
-          recipe.tags.forEach((tag) => tags.add(tag));
-        });
+      const tags = new Set<string>();
+      data.forEach((recipe) => {
+        (recipe.tags || []).forEach((tag) => tags.add(tag)); // ✅ Safe
+      });
 
-        const sortedTags = Array.from(tags).sort((a, b) => a.localeCompare(b));
-        setAllTags(sortedTags);
-        setTagColors(buildTagColors(sortedTags)); // Assign colors once here
-      } catch (error) {
-        console.error("Error fetching recipes:", error);
-      }
+      const sortedTags = Array.from(tags).sort((a, b) => a.localeCompare(b));
+      setAllTags(sortedTags);
+      setTagColors(buildTagColors(sortedTags));
+    } catch (error) {
+      console.error("Error fetching recipes:", error);
     }
+  }
 
+  // Just call it here at startup
+  useEffect(() => {
     loadRecipes();
   }, []);
 
@@ -94,16 +101,22 @@ export default function HomePage() {
           fullyFiltered.map((recipe) => (
             <div
               key={recipe.id}
-              onClick={() => handleCardClick(recipe.id)}
-              className="w-full max-w-md bg-gray-400 text-black rounded-lg p-6 shadow cursor-pointer transition-all"
+              className="w-full max-w-md bg-gray-400 text-black rounded-lg p-6 shadow transition-all"
             >
-              <h2 className="text-2xl font-semibold text-center mb-4">
-                {recipe.name}
-              </h2>
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <h2 className="text-2xl font-semibold text-center">
+                  {recipe.name}
+                </h2>
+                <ExpandContractButton
+                  isExpanded={expandedId === recipe.id}
+                  onToggle={() => handleCardClick(recipe.id)}
+                />
+              </div>
+
               <div className="flex flex-col items-center gap-4">
                 {/* Tags */}
                 <div className="flex flex-wrap justify-center gap-2">
-                  {recipe.tags.map((tag) => (
+                  {(recipe.tags || []).map((tag) => (
                     <span
                       key={tag}
                       className={`${
@@ -159,6 +172,15 @@ export default function HomePage() {
                         <p>{recipe.notes}</p>
                       </div>
                     )}
+
+                    <DeleteRecipeButton
+                      recipeId={recipe.id}
+                      recipeName={recipe.name}
+                      onDelete={() => {
+                        loadRecipes(); // ✅ Refresh recipes
+                        setExpandedId(null); // ✅ Collapse card
+                      }}
+                    />
                   </div>
                 )}
               </div>
@@ -166,6 +188,16 @@ export default function HomePage() {
           ))
         )}
       </div>
+
+      {/* Add Recipes Button */}
+      <AddRecipeButton onClick={() => setIsModalOpen(true)} />
+      {isModalOpen && (
+        <AddRecipeModal
+          allTags={allTags}
+          onClose={() => setIsModalOpen(false)}
+          reloadRecipes={loadRecipes} // ✅ Now correctly passed!
+        />
+      )}
     </main>
   );
 }
