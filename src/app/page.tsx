@@ -15,6 +15,7 @@ export default function HomePage() {
   const [searchText, setSearchText] = useState("");
   const [allTags, setAllTags] = useState<string[]>([]);
   const [tagColors, setTagColors] = useState<{ [tag: string]: string }>({});
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const {
     selectedTags,
@@ -24,6 +25,10 @@ export default function HomePage() {
     filterRecipes,
     setSelectedTags,
   } = useTagFilter(allTags);
+
+  const handleCardClick = (id: string) => {
+    setExpandedId((prev) => (prev === id ? null : id));
+  };
 
   useEffect(() => {
     async function loadRecipes() {
@@ -89,20 +94,73 @@ export default function HomePage() {
           fullyFiltered.map((recipe) => (
             <div
               key={recipe.id}
-              className="w-full max-w-md bg-gray-400 text-black rounded-lg p-6 shadow"
+              onClick={() => handleCardClick(recipe.id)}
+              className="w-full max-w-md bg-gray-400 text-black rounded-lg p-6 shadow cursor-pointer transition-all"
             >
               <h2 className="text-2xl font-semibold text-center mb-4">
                 {recipe.name}
               </h2>
-              <div className="flex flex-wrap justify-center gap-2">
-                {recipe.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className={`${tagColors[tag] || "bg-gray-600"} text-white text-sm font-medium px-3 py-1 rounded-full`}
-                  >
-                    {tag}
-                  </span>
-                ))}
+              <div className="flex flex-col items-center gap-4">
+                {/* Tags */}
+                <div className="flex flex-wrap justify-center gap-2">
+                  {recipe.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className={`${
+                        tagColors[tag] || "bg-gray-600"
+                      } text-white text-sm font-medium px-3 py-1 rounded-full`}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Expanded Details */}
+                {expandedId === recipe.id && (
+                  <div className="w-full mt-4 text-left text-black bg-gray-200 p-4 rounded-lg">
+                    {/* Description */}
+                    {recipe.description && (
+                      <div className="mb-4">
+                        <h3 className="font-bold mb-2">Description:</h3>
+                        <p>{recipe.description}</p>
+                      </div>
+                    )}
+
+                    {/* Ingredients */}
+                    {recipe.ingredients && (
+                      <div className="mb-4">
+                        <h3 className="font-bold mb-2">Ingredients:</h3>
+                        <ul className="list-disc list-inside">
+                          {recipe.ingredients.split("\n").map((line, index) => (
+                            <li key={index}>{line}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Instructions */}
+                    {recipe.instructions && (
+                      <div className="mb-4">
+                        <h3 className="font-bold mb-2">Instructions:</h3>
+                        <ol className="list-decimal list-inside">
+                          {recipe.instructions
+                            .split("\n")
+                            .map((step, index) => (
+                              <li key={index}>{step}</li>
+                            ))}
+                        </ol>
+                      </div>
+                    )}
+
+                    {/* Notes */}
+                    {recipe.notes && (
+                      <div>
+                        <h3 className="font-bold mb-2">Notes:</h3>
+                        <p>{recipe.notes}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           ))
