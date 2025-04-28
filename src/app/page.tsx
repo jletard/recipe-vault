@@ -117,7 +117,7 @@ export default function HomePage() {
 
                 {/* Expanded Details */}
                 {expandedId === recipe.id && (
-                  <div className="w-full mt-4 text-left text-black bg-gray-200 p-4 rounded-lg">
+                  <div className="w-full mt-4 text-left text-black bg-gray-200 p-4 rounded-lg transition-all duration-700 ease-out overflow-hidden">
                     {/* Description */}
                     {recipe.description && (
                       <div className="mb-4">
