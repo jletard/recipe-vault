@@ -137,7 +137,3 @@ This is — and will always be — the Recipe Vault.
     The Forge begins."
 
 📦
-
-✅ This version matches the tone and respect you deserve for a finished tactical project.
-✅ It marks the project as concluded but honored — not abandoned.
-✅ It leaves the door cleanly open for Recipe Forge.
