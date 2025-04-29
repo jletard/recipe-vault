@@ -1,7 +1,9 @@
 // src/components/ExpandContractButton.tsx
-// Button to toggle expanding and collapsing a recipe card.
+// Button to toggle expanding and collapsing a recipe card (Batman Theme Approved, Arrow Upgraded).
 
 "use client";
+
+import { ChevronUp, ChevronDown } from "lucide-react";
 
 interface ExpandContractButtonProps {
   isExpanded: boolean;
@@ -15,9 +17,13 @@ export default function ExpandContractButton({
   return (
     <button
       onClick={onToggle}
-      className="text-white bg-gray-700 hover:bg-gray-600 px-2 py-1 rounded ml-2 text-sm"
+      className="bg-black hover:bg-gray-800 text-white rounded-full p-2 transition-colors"
     >
-      {isExpanded ? "▲" : "▼"}
+      {isExpanded ? (
+        <ChevronUp className="w-5 h-5" />
+      ) : (
+        <ChevronDown className="w-5 h-5" />
+      )}
     </button>
   );
 }

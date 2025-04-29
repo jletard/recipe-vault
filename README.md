@@ -1,113 +1,135 @@
-# Recipe Vault
+# Recipe Vault 🥘🔧
 
 **The Unseen Chef Archive**
 
-A mobile-first web application for browsing and managing recipes stored in Airtable.
+A mobile-first web application for browsing, managing, and safeguarding recipes —  
+**dark, tactical, and elegant** like Gotham itself.
 
 ---
 
 ## 📋 Project Overview
 
-Recipe Vault is a Next.js app (with TypeScript and TailwindCSS) that connects to an Airtable database to fetch and display recipes.  
-It is designed primarily for mobile screens but will scale up cleanly on larger devices.
+Recipe Vault is a Next.js app (built with TypeScript and TailwindCSS) that connects securely to an Airtable database to manage recipes.
 
-Each recipe currently displays:
-- The recipe name
-- Expand/Collapse control for full details
-- Associated tags (as styled color-coded badges)
-- Ingredients formatted into a bulleted list
-- Instructions formatted into a numbered list
-- Notes (optional)
+Designed with a **mobile-first Gotham philosophy** —  
+**sleek** on large screens, but always **combat-ready** for mobile.
+
+Each recipe card features:
+
+- 🔧 Recipe name (dark-mode styling)
+- 🔧 Expand/Collapse control (no accidental clicks)
+- 🔧 Dynamic, color-coded tag badges
+- 🔧 Ingredients formatted as a bulleted list
+- 🔧 Procedure steps numbered cleanly
+- 🔧 Optional notes section
 
 ---
 
 ## 🚀 Current Status
 
-✅ **As of today’s milestone:**
+✅ **Major Gotham Milestone Reached:**
 
-- Full live Airtable connection (Add, Fetch, Delete recipes)
-- Recipes are displayed as expandable/collapsible cards
-- Expand/Collapse now controlled by a clean, independent button (no card click conflicts)
-- Tags are dynamically extracted, color-coded, and displayed as badges
-- Tag filtering and live search filtering both fully functional
-- **Dynamic Tag System:** Tags update automatically — no stale tags if recipes are deleted
-- Add New Recipe with new or existing tags
-- Confirmed Delete flow with confirmation modal
-- Full reload after Add/Delete operations to ensure fresh data
-- Project architecture remains modular, clean, and scalable
-
----
-
-## 🔥 Fetch Strategy
-
-For security and best practices:
-
-- Airtable API requests **are not made directly from the browser**.
-- Instead, a **Next.js internal API route** (`/api/recipes`, `/api/add-recipe`, `/api/delete-recipe`) handles server-side fetching and mutations.
-- The server routes:
-  - Read Airtable credentials from `.env.local`
-  - Interact securely with the Airtable base
-  - Map responses into clean, strongly-typed objects
-- Client (`page.tsx`) fetches recipes from `/api/recipes` at runtime and renders them.
-
-✅ Airtable API token is **completely hidden**.
-
-✅ All data interactions are server-controlled.
+- Full live Airtable connection (Add ➔ Fetch ➔ Edit ➔ Delete)
+- Expand/Collapse control via dedicated button (no more click conflicts)
+- Dynamic, color-coded Tag System fully operational
+- Real-time Tag Filtering and Live Search filtering
+- Add New Recipes (with either existing tags or brand-new tags)
+- Confirmed Edit and Delete flows with sleek confirmation modals
+- Full Pagination and Display Count Selector integrated
+- Automatic reloads after Add/Edit/Delete to ensure fresh, accurate UI
+- Fully modular, scalable, and organized project architecture
 
 ---
 
-## 🛣️ Planned TODO Features
+## 🔥 Data Fetch Strategy
 
-### 🥇 First Priority (Next)
+**For maximum security and elegance:**
 
-- Small UI Polish for Expand/Collapse Button (make it visually match site style)
-- Tighten mobile layout further (spacing, text sizing)
+- No Airtable API exposure to the browser
+- All interactions via **Next.js internal API routes**:
+  - `/api/recipes`
+  - `/api/add-recipe`
+  - `/api/edit-recipe`
+  - `/api/delete-recipe`
+- Server Routes:
+  - Read Airtable credentials securely from `.env.local`
+  - Map Airtable fields into clean, strongly-typed Recipe objects
+- Client (`page.tsx`) fetches pre-sanitized data safely
 
-### 🥈 Second Priority (Enhancements)
-
-- Add Edit Recipe functionality (optional)
-- Allow deleting multiple recipes at once (batch mode)
-
-### 🥉 Third Priority (Advanced Personalization)
-
-- Assign specific colors to specific tags
-- Tag sorting and grouping (optional)
-
-### 🚀 Fourth Priority (Deployment)
-
-- Deploy clean version to Vercel
-- Add meta tags, favicon, PWA tweaks
-
-### 🌎 Fifth Priority (Optional Future Expansion)
-
-- Upload photos per recipe
-- Add public browsing mode
-- Share recipe links
+✅ Airtable API token stays hidden — always.  
+✅ All Airtable interactions are **server-controlled and bat-proof**.
 
 ---
 
-## 📄 Technical Notes
+## 🛃️ Planned TODO Features
 
-- Full **TypeScript** enforcement, no `any` types allowed
-- Strongly-typed Airtable field names prevent bugs
-- Clean project structure (`/app`, `/lib`, `/types`, `/components`, `/utils`, `/hooks`)
-- Mobile-first responsive design
+### 🥇 Immediate Priorities
+
+- Minor UI polish for Expand/Collapse button (visual tightness)
+- Slight adjustments for perfect mobile responsiveness
+- Optional Pagination UI refinement (minor styling for mobile)
+
+### 🥈 Enhancement Wave
+
+- Batch Delete capability for multiple recipes at once
+- Optional tag editing features (in-place tag management)
+
+### 🥉 Personalization Level
+
+- Permanent color assignments to key tags
+- Optional tag grouping/sorting features
+
+### 🚀 Deployment Targets
+
+- Deploy to Vercel
+- Add SEO meta tags, favicon, and minor PWA optimizations
+
+### 🌎 Future Optional Expansions
+
+- Upload and display recipe photos
+- Public recipe browsing mode
+- Shareable recipe links
 
 ---
 
-## 🏆 Notes on Today’s Win (April 28, 2025)
+## 📄 Technical Strengths
 
-Today was a critical day for stability and structure:
+    Full strict TypeScript coverage — no any left in Gotham
 
-- Solved major UX problem with card clicks
-- Created clean Expand/Collapse component
-- Built real Delete flow with confirmation
-- Airtable live sync verified
-- Dynamic Tag system verified
-- Structure ready for full feature expansion
+    Airtable field names are strongly typed and protected
 
-✅ A serious professional milestone.  
-✅ No hidden broken behaviors.  
-✅ Ready for polish and future scaling.
+    Modular folder structure (/app, /components, /hooks, /lib, /types, /utils)
+
+    Mobile-first philosophy — responsive across all devices, including Samsung Fold, iPhones, and Batphones
+
+    🔧 Unified Tag System:
+    All tag visual styles are handled through a single reusable TagPill component (/components/TagPill.tsx).
+    This ensures consistent appearance across Recipe Cards, Tag Filters, and the Add Recipe modal.
+    Selected and unselected visual states are automatically managed inside the component —
+    eliminating duplicated Tailwind class definitions and hardening the design for future scalability.
 
 ---
+
+## 🏆 Notes on Today’s Triumph (April 30, 2025)
+
+Today, Gotham grew even stronger:
+
+- Full Edit Recipe functionality implemented
+- Pagination system added with Display Count control
+- Gotham-style Card layout standardized across pages
+- Page.tsx refactored into a true Batcave control center
+- Minor UI skews eliminated (no Smallville issues left)
+- Full CRUD cycle (Add/Edit/Delete) confirmed clean and robust
+
+✅ True professional-grade engineering  
+✅ Zero hidden bugs  
+✅ Platform fully battle-hardened and ready for expansion
+
+---
+
+🔧  
+**Built for speed.  
+Built for stealth.  
+Built for victory.**
+
+**This is the Recipe Vault.**

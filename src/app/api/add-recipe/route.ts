@@ -1,7 +1,8 @@
 // src/app/api/add-recipe/route.ts
-// API route for adding a new recipe to Airtable.
+// API route for adding a new recipe to Airtable (Gotham-grade hardened).
 
 import { NextRequest, NextResponse } from "next/server";
+import { NewRecipe, FIELD_NAMES } from "@/types/api";
 
 const AIRTABLE_API_TOKEN = process.env.AIRTABLE_API_TOKEN;
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
@@ -18,10 +19,10 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const body = await req.json();
+    const body = (await req.json()) as NewRecipe;
 
-    // Basic validation
-    if (!body.name || !body.tags || !Array.isArray(body.tags) || body.tags.length === 0) {
+    // Validation
+    if (!body.name.trim() || !body.tags || !Array.isArray(body.tags) || body.tags.length === 0) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -30,12 +31,12 @@ export async function POST(req: NextRequest) {
 
     const airtablePayload = {
       fields: {
-        "Recipe Name": body.name,
-        "Description": body.description || "",
-        "Ingredients": body.ingredients || "",
-        "Instructions": body.instructions || "",
-        "Notes": body.notes || "",
-        "Tags": JSON.stringify(body.tags || []),
+        [FIELD_NAMES.NAME]: body.name,
+        [FIELD_NAMES.DESCRIPTION]: body.description || "",
+        [FIELD_NAMES.INGREDIENTS]: body.ingredients || "",
+        [FIELD_NAMES.INSTRUCTIONS]: body.instructions || "",
+        [FIELD_NAMES.NOTES]: body.notes || "",
+        [FIELD_NAMES.TAGS]: JSON.stringify(body.tags || []),
       },
     };
 

@@ -1,5 +1,5 @@
 // src/app/api/delete-recipe/route.ts
-// API route to delete a recipe record from Airtable.
+// API route to delete a recipe record from Airtable (Gotham-grade hardened).
 
 import { NextRequest, NextResponse } from "next/server";
 
@@ -16,7 +16,7 @@ const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE
 export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id"); // ✅ Pull ID from query string
+    const id = searchParams.get("id");
 
     if (!id) {
       return NextResponse.json({ error: "Missing recipe ID" }, { status: 400 });
@@ -35,9 +35,9 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Failed to delete recipe" }, { status: 500 });
     }
 
-    return NextResponse.json({ message: "Recipe deleted successfully" });
+    return NextResponse.json({ message: "Recipe deleted successfully" }, { status: 200 });
   } catch (error) {
-    console.error(error);
+    console.error("Server error:", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

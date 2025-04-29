@@ -1,9 +1,10 @@
 // src/components/DeleteRecipeButton.tsx
-// Button for deleting a recipe with confirmation modal.
+// Gotham-grade Delete Recipe Button (Modal separated from flex flow)
 
 "use client";
 
 import { useState } from "react";
+import { Trash2 } from "lucide-react";
 
 interface DeleteRecipeButtonProps {
   recipeId: string;
@@ -22,16 +23,12 @@ export default function DeleteRecipeButton({
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      const res = await fetch(`/api/delete-recipe?id=${recipeId}`, {
-        method: "DELETE",
-      });
-  
+      const res = await fetch(`/api/delete-recipe?id=${recipeId}`, { method: "DELETE" });
       if (!res.ok) {
         throw new Error("Failed to delete recipe");
       }
-  
       setShowConfirm(false);
-      onDelete(); // Tell parent to refresh
+      onDelete();
     } catch (error) {
       console.error(error);
     } finally {
@@ -40,16 +37,18 @@ export default function DeleteRecipeButton({
   };
 
   return (
-    <div className="flex flex-col items-center mt-4">
-      {/* Delete button */}
+    <>
+      {/* Pure Delete Button */}
       <button
         onClick={() => setShowConfirm(true)}
-        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+        className="flex items-center justify-center gap-2 bg-black hover:bg-red-800 text-gray-300 px-4 py-2 min-h-[44px] rounded transition-colors text-sm font-semibold tracking-wide"
+
       >
-        Delete Recipe
+        <Trash2 className="w-5 h-5 flex-shrink-0" />
+        <span>Delete Recipe</span>
       </button>
 
-      {/* Confirmation Modal */}
+      {/* Modal (separated from flex flow) */}
       {showConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white text-black rounded-lg p-6 w-full max-w-sm text-center">
@@ -68,7 +67,7 @@ export default function DeleteRecipeButton({
               <button
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+                className="bg-black hover:bg-red-800 text-white px-4 py-2 rounded"
               >
                 {isDeleting ? "Deleting..." : "Yes, Delete"}
               </button>
@@ -76,6 +75,6 @@ export default function DeleteRecipeButton({
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

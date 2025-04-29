@@ -1,53 +1,88 @@
-// src/components/AddRecipeModal.tsx
-// Gotham Style: Dark, clean, stealth modal for adding a new recipe.
+// src/components/EditRecipeModal.tsx
+// Gotham-Grade Edit Recipe Modal
 
 "use client";
 
-import { useRef, useEffect, useState } from "react";
-import { useAddRecipe } from "@/hooks/useAddRecipe";
+import { useState, useRef, useEffect } from "react";
+import { Recipe } from "@/types/recipe";
 import TagPill from "@/components/TagPill";
 
-interface AddRecipeModalProps {
-  allTags: string[];
-  tagColors: { [tag: string]: string };
+interface EditRecipeModalProps {
+  recipe: Recipe;
   onClose: () => void;
   reloadRecipes: () => Promise<void>;
+  tagColors: { [tag: string]: string };
 }
 
-export default function AddRecipeModal({
-  allTags,
-  tagColors,
+export default function EditRecipeModal({
+  recipe,
   onClose,
   reloadRecipes,
-}: AddRecipeModalProps) {
+  tagColors,
+}: EditRecipeModalProps) {
   const backdropRef = useRef<HTMLDivElement>(null);
 
-  const {
-    recipeName,
-    description,
-    ingredients,
-    procedure,
-    notes,
-    selectedTags,
-    handleNameChange,
-    handleDescriptionChange,
-    handleNotesChange,
-    handleIngredientChange,
-    handleAddIngredient,
-    handleProcedureChange,
-    handleAddProcedure,
-    handleTagToggle,
-    handleSubmit,
-    isSaving,
-    setSelectedTags,
-  } = useAddRecipe({
-    onSuccess: async () => {
-      await reloadRecipes();
-      onClose();
-    },
-  });
-
+  const [recipeName, setRecipeName] = useState(recipe.name || "");
+  const [description, setDescription] = useState(recipe.description || "");
+  const [ingredients, setIngredients] = useState<string[]>(
+    recipe.ingredients?.split("\n") || []
+  );
+  const [procedure, setProcedure] = useState<string[]>(
+    recipe.instructions?.split("\n") || []
+  );
+  const [notes, setNotes] = useState(recipe.notes || "");
+  const [selectedTags, setSelectedTags] = useState<string[]>(recipe.tags || []);
   const [newTagInput, setNewTagInput] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Close if clicking outside modal
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isSaving) return; // 🚫 Block closing while saving
+      if (backdropRef.current && event.target === backdropRef.current) {
+        onClose();
+      }
+    };
+    window.addEventListener("click", handleClickOutside);
+    return () => window.removeEventListener("click", handleClickOutside);
+  }, [onClose, isSaving]);
+  
+
+  const handleIngredientChange = (index: number, value: string) => {
+    const updated = [...ingredients];
+    updated[index] = value;
+    setIngredients(updated);
+  };
+
+  const handleAddIngredient = () => {
+    setIngredients((prev) => [...prev, ""]);
+  };
+
+  const handleDeleteIngredient = (index: number) => {
+    setIngredients((prev) => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleProcedureChange = (index: number, value: string) => {
+    const updated = [...procedure];
+    updated[index] = value;
+    setProcedure(updated);
+  };
+
+  const handleAddProcedure = () => {
+    setProcedure((prev) => [...prev, ""]);
+  };
+
+  const handleDeleteProcedure = (index: number) => {
+    setProcedure((prev) => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleTagToggle = (tag: string) => {
+    if (selectedTags.includes(tag)) {
+      setSelectedTags((prev) => prev.filter((t) => t !== tag));
+    } else {
+      setSelectedTags((prev) => [...prev, tag]);
+    }
+  };
 
   const handleNewTagAdd = () => {
     const trimmed = newTagInput.trim();
@@ -60,28 +95,58 @@ export default function AddRecipeModal({
         .join(" ");
       if (!selectedTags.includes(formatted)) {
         setSelectedTags((prev) => [...prev, formatted]);
-
         if (!tagColors[formatted]) {
-          tagColors[formatted] = "bg-sky-400";
+          tagColors[formatted] = "bg-sky-400"; // Fresh color for new tags
         }
       }
     }
     setNewTagInput("");
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (isSaving) return; // 🚫 Block closing while saving
-      if (backdropRef.current && event.target === backdropRef.current) {
-        onClose();
+  const handleSubmit = async () => {
+    if (!recipeName.trim()) {
+      alert("Recipe requires a name.");
+      return;
+    }
+    if (selectedTags.length === 0) {
+      alert("Recipe requires at least one tag.");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const response = await fetch("/api/edit-recipe", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: recipe.id,
+          name: recipeName.trim(),
+          description: description.trim(),
+          ingredients: ingredients.join("\n").trim(),
+          instructions: procedure.join("\n").trim(),
+          notes: notes.trim(),
+          tags: selectedTags,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to edit recipe");
       }
-    };
-    window.addEventListener("click", handleClickOutside);
-    return () => window.removeEventListener("click", handleClickOutside);
-  }, [onClose, isSaving]);
+
+      await reloadRecipes();
+      onClose();
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong while saving changes.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const combinedTags = Array.from(
-    new Set([...allTags, ...selectedTags])
+    new Set([...Object.keys(tagColors), ...selectedTags])
   ).sort();
 
   return (
@@ -90,16 +155,16 @@ export default function AddRecipeModal({
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     >
       <div className="bg-gray-800 text-black rounded-lg shadow-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-4 text-center">Add New Recipe</h2>
+        <h2 className="text-2xl font-bold mb-4 text-center">Edit Recipe</h2>
 
-        {/* Form Section */}
+        {/* Form */}
         <div className="flex flex-col gap-4">
-          {/* Recipe Name */}
+          {/* Name */}
           <input
             type="text"
             placeholder="Recipe Name"
             value={recipeName}
-            onChange={(e) => handleNameChange(e.target.value)}
+            onChange={(e) => setRecipeName(e.target.value)}
             className="bg-gray-700 text-black placeholder-gray-500 border border-gray-600 p-2 rounded w-full"
           />
 
@@ -107,7 +172,7 @@ export default function AddRecipeModal({
           <textarea
             placeholder="Description"
             value={description}
-            onChange={(e) => handleDescriptionChange(e.target.value)}
+            onChange={(e) => setDescription(e.target.value)}
             className="bg-gray-700 text-black placeholder-gray-500 border border-gray-600 p-2 rounded w-full"
           />
 
@@ -126,6 +191,13 @@ export default function AddRecipeModal({
                     }
                     className="bg-gray-700 text-black placeholder-gray-500 border border-gray-600 p-2 rounded flex-1"
                   />
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteIngredient(idx)}
+                    className="bg-black hover:bg-red-700 text-white text-sm px-2 py-1 rounded"
+                  >
+                    ✖
+                  </button>
                 </li>
               ))}
             </ul>
@@ -151,6 +223,13 @@ export default function AddRecipeModal({
                     onChange={(e) => handleProcedureChange(idx, e.target.value)}
                     className="bg-gray-700 text-black placeholder-gray-500 border border-gray-600 p-2 rounded flex-1"
                   />
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteProcedure(idx)}
+                    className="bg-black hover:bg-red-700 text-white text-sm px-2 py-1 rounded"
+                  >
+                    ✖
+                  </button>
                 </li>
               ))}
             </ul>
@@ -167,7 +246,7 @@ export default function AddRecipeModal({
           <textarea
             placeholder="Notes (Optional)"
             value={notes}
-            onChange={(e) => handleNotesChange(e.target.value)}
+            onChange={(e) => setNotes(e.target.value)}
             className="bg-gray-700 text-black placeholder-gray-500 border border-gray-600 p-2 rounded w-full"
           />
 
@@ -234,7 +313,7 @@ export default function AddRecipeModal({
             className={`flex items-center justify-center gap-2 px-4 py-2 rounded transition-colors ${
               isSaving
                 ? "bg-gray-500 text-white cursor-not-allowed"
-                : "bg-black hover:bg-green-800 text-gray-300"
+                : "bg-black hover:bg-green-800 text-white"
             }`}
           >
             {isSaving ? (
@@ -262,7 +341,7 @@ export default function AddRecipeModal({
                 Saving...
               </>
             ) : (
-              "Add Recipe"
+              "Save Changes"
             )}
           </button>
         </div>

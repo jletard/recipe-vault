@@ -2,6 +2,7 @@
 // Fetches recipes from Airtable with fully typed fields.
 
 import { Recipe } from "@/types/recipe";
+import { FIELD_NAMES, AirtableResponse } from "@/types/api";
 
 const AIRTABLE_API_TOKEN = process.env.AIRTABLE_API_TOKEN;
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID;
@@ -12,34 +13,6 @@ if (!AIRTABLE_API_TOKEN || !AIRTABLE_BASE_ID || !AIRTABLE_TABLE_NAME) {
 }
 
 const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`;
-
-// Strongly typed field names
-const FIELD_NAMES = {
-  NAME: "Recipe Name",
-  DESCRIPTION: "Description",
-  INGREDIENTS: "Ingredients",
-  INSTRUCTIONS: "Instructions",
-  NOTES: "Notes",
-  TAGS: "Tags",
-} as const;
-
-interface AirtableRecipeFields {
-  [FIELD_NAMES.NAME]?: string;
-  [FIELD_NAMES.DESCRIPTION]?: string;
-  [FIELD_NAMES.INGREDIENTS]?: string;
-  [FIELD_NAMES.INSTRUCTIONS]?: string;
-  [FIELD_NAMES.NOTES]?: string;
-  [FIELD_NAMES.TAGS]?: string;
-}
-
-interface AirtableRecord {
-  id: string;
-  fields: AirtableRecipeFields;
-}
-
-interface AirtableResponse {
-  records: AirtableRecord[];
-}
 
 export async function fetchRecipes(): Promise<Recipe[]> {
   const res = await fetch(AIRTABLE_URL, {
